@@ -1,0 +1,12 @@
+*Written by 伟明.ANA*New Customer VM Details
+Time Activated = 2019-10-04 12:10:22 Friday
+OS Distribution = CentOS 7.5
+CPU = 1 Core
+Memory = 1839 MB
+Storage = 30.99 GB
+User = root
+Password = AGBP@ssw0rd
+Please Delete thisNew Customer VM Details
+Private IP = 172.19.6.30
+Public IP = 45.64.72.175
+Bandwidth = 5M/5M MB

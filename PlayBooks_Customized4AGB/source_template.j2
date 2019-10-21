@@ -1,0 +1,11 @@
+New Customer VM Details
+Time Activated = {{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ ansible_date_time.weekday }}
+OS Distribution = {{ ansible_distribution }} {{ ansible_distribution_version }}
+CPU = {{ ansible_processor_vcpus }} Core
+Memory = {{ ansible_memtotal_mb }} MB
+Storage = {{ ansible_lvm['vgs']['cl']['size_g']}} GB
+Bandwidth =
+Private IP = {{ private_ip }}
+Public IP =
+User = root
+Password = {{ password_prompt }}

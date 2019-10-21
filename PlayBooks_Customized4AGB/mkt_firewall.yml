@@ -1,0 +1,69 @@
+---
+- hosts: mikrotik
+  gather_facts: no
+  vars_prompt:
+   - name: "vm_name"
+     prompt: "Enter the VM name"
+     private: no
+   - name: "mac_address"
+     prompt: "Enter the MAC Address of VM"
+     private: no
+   - name: "private_ip"
+     prompt: "Enter the Private IP you want to assign"
+     private: no
+   - name: "public_ip"
+     prompt: "Enter the Public IP you want to assign"
+     private: no
+   - name: "bandwidth"
+     prompt: "Enter the bandwidth limit of VM Eg. 5M/5M"
+     private: no
+   - name: "min_bandwidth" 
+     prompt: "Enter the Minimum bandwidth of VM Eg. 2.5M/2.5M"
+     private: no
+  tasks:
+    - name: lease private ip to vm's mac address
+      routeros_command:
+         commands: /ip dhcp-server lease add address={{ private_ip }} server=ChinaPrivateIP_6.0
+                    comment={{ vm_name }} mac-address={{ mac_address }}
+      register: dhcp_lease_private
+    - debug:
+        msg: "{{ dhcp_lease_private.stdout_lines|list }}"
+    - name: lease public ip to vm's mac address
+      routeros_command:
+         commands: /ip dhcp-server lease add address={{ public_ip }} server=China_45
+                    comment={{ vm_name }} mac-address={{ mac_address }}
+      register: dhcp_lease_public
+    - debug:
+        msg: "{{ dhcp_lease_public.stdout_lines|list }}"
+    - name: add a src-nat rule for vm
+      routeros_command:
+          commands: /ip firewall nat add chain=srcnat src-address={{ private_ip }}
+                     action=src-nat to-addresses={{ public_ip }} comment={{ vm_name }}NAT
+      register: src_nat
+    - debug:
+        msg: "{{ src_nat.stdout_lines|list }}"
+    - name: add a dst-nat rule for vm
+      routeros_command:
+        commands: /ip firewall nat add chain=dstnat dst-address={{ public_ip }}
+                   action=dst-nat to-addresses={{ private_ip }}
+      register: dst_nat
+    - debug:
+        msg: "{{ dst_nat.stdout_lines|list }}"
+    - name: add a simeple queue
+      routeros_command:
+         commands: /queue simple add name={{ vm_name }} target={{ private_ip }} max-limit={{ bandwidth }} limit-at={{ min_bandwidth }}
+      register: simple_queue
+    - debug:
+         msg: "{{ simple_queue.stdout_lines|list }}"
+    - name: deliver template
+      template:
+         src: source_template_network.j2
+         dest: ProjectK/{{ vm_name }}.txt
+      delegate_to: localhost
+    - name: update ansible host file
+      lineinfile:
+        path: /root/hosts
+        line: "{{ private_ip }}"
+        insertafter: '^\[lvm\]'
+        state: present
+      delegate_to: localhost
