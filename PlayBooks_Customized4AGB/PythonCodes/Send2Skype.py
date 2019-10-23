@@ -1,9 +1,9 @@
 from skpy import Skype
-fname = raw_input("Type the file name to send out: ")
+fname = input("Type the file name to send out: ")
 f = open(fname, "r")
 if f.mode == 'r':
   contents =f.read()
-print contents
+print (contents)
 sk = Skype("ayenyeinaung666@gmail.com", "leepallox123") # connect to Skype
 sk.user # you
 sk.contacts # your contacts
