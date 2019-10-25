@@ -3,8 +3,8 @@ import glob
 import os
 import pandas as pd
 
-writer = ExcelWriter("output.xlsx")
-
+writer = ExcelWriter("MMIX_OCT.xlsx")
+os.chdir(r"C:\Users\ayeny\OneDrive\Desktop\MMIX OCT")
 for filename in glob.glob("*.xlsx"):
     excel_file = pd.ExcelFile(filename)
     (_, f_name) = os.path.split(filename)
