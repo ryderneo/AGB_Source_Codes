@@ -27,7 +27,7 @@
         delegate_to: localhost
       - debug:
          msg: "{{ new_password }}"
-      - name: Update Root user's Password
+      - name: Update sftp user's Password
         user:
            name: ana_sftp
            update_password: always
