@@ -17,7 +17,7 @@
    - name: "bandwidth"
      prompt: "Enter the bandwidth limit of VM Eg. 5M/5M"
      private: no
-   - name: "min_bandwidth" 
+   - name: "min_bandwidth"
      prompt: "Enter the Minimum bandwidth of VM Eg. 2.5M/2.5M"
      private: no
   tasks:
@@ -49,7 +49,7 @@
       register: dst_nat
     - debug:
         msg: "{{ dst_nat.stdout_lines|list }}"
-    - name: add a simeple queue
+    - name: add a simple queue
       routeros_command:
          commands: /queue simple add name={{ vm_name }} target={{ private_ip }} max-limit={{ bandwidth }} limit-at={{ min_bandwidth }}
       register: simple_queue

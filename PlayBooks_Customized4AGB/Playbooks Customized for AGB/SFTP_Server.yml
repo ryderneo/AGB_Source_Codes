@@ -1,0 +1,54 @@
+---
+- hosts: "{{ hosts_prompt }}"
+  gather_facts: yes
+  vars_prompt:
+     - name: "hosts_prompt" ## Host where playbook about to play
+       prompt: "Enter the Host or Host group need to run with this Playbook Eg.172.19.6.xx"
+       private: no
+  tasks:
+     - name: Create a directory if it does not exist
+       file:
+        path: /data/
+        state: directory
+        mode: '0701'
+     - name: Ensure group "stpusers" exists
+       group:
+        name: sftpusers
+        state: present
+     - name: Add a sftp user account
+       user:
+        name: ana_sftp
+        shell: /sbin/nologin
+        groups: sftpusers
+        home: /upload
+      - name: Create a password for sftp user.
+        command: python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+        register: new_password
+        delegate_to: localhost
+      - debug:
+         msg: "{{ new_password }}"
+      - name: Update Root user's Password
+        user:
+           name: ana_sftp
+           update_password: always
+           password: "{{ new_password.stdout }}"
+        when: ansible_distribution == 'CentOS'
+      - name: Create a upload dir for sftp users
+        file:
+         path: /data/ana_sftp/upload
+         state: directory
+         owner: ana_sftp
+         group: sftpusers
+      - name: Insert/Update configuration using a local file and validate it
+        blockinfile:
+         block: |
+            Match Group sftpusers
+            ChrootDirectory /data/%u
+            ForceCommand internal-sftp
+        dest: /etc/ssh/sshd_config
+        backup: yes
+        validate: /usr/sbin/sshd -T -f %s
+      - name: Restart service sshd
+        service:
+         name: sshd
+         state: restarted

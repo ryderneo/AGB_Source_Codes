@@ -3,7 +3,7 @@ import time
 import getpass
 port = 587
 server = 'smtp.ipage.com'
-recipients = ['sutram@agbcommunication.com']
+recipients = ['zawwinhtut@agbcommunication.com']
 sender = 'ayenyeinaung@agbcommunication.com'
 message = 'From: ayenyeinaung@agbcommunication.com\nSubject: [PGS]: Results\n\nBlaBlaBla'
 session = smtplib.SMTP('smtp.ipage.com', 587)
